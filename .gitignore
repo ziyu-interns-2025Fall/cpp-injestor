@@ -3,3 +3,4 @@ build/
 .DS_Store
 .vscode/
 .zed/
+compile_commands.json
