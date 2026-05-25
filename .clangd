@@ -1,0 +1,13 @@
+CompileFlags:
+  CompilationDatabase: .
+  Add: [-std=c++20, -Wall]
+Index:
+  Background: Build
+Diagnostics:
+  UnusedIncludes: Strict
+  ClangTidy:
+    Add: [bugprone-*, performance-*, readability-*, modernize-*]
+    Remove: [readability-braces-around-statements]
+    CheckOptions:
+      readability-identifier-naming.VariableCase: camelCase
+      readability-identifier-naming.FunctionCase: camelCase
