@@ -23,6 +23,20 @@ auto PdfParser::get_ieee_config() -> ParserConfig {
     return config;
 }
 
+auto PdfParser::get_generic_config() -> ParserConfig {
+    ParserConfig config;
+    config.header_zone = 0.05;
+    config.footer_zone = 0.95;
+    config.min_header_size = 10.0;
+
+    // A generic rule: anything size 14+ is level 1
+    config.rules.push_back({{14.0, 100.0}, "", false, false, false, 1});
+    // size 12-14 is level 2
+    config.rules.push_back({{12.0, 13.99}, "", false, false, false, 2});
+
+    return config;
+}
+
 auto PdfParser::extract_text(const std::string& filepath, const ParserConfig& config) -> std::string {
     auto doc = poppler::document::load_from_file(filepath);
     if (!doc) {
@@ -31,7 +45,7 @@ auto PdfParser::extract_text(const std::string& filepath, const ParserConfig& co
 
     std::string full_text;
     for (int i = 0; i < doc->pages(); ++i) {
-        auto page = doc->create_page(i);
+        auto *page = doc->create_page(i);
         if (!page) continue;
 
         double page_height = page->page_rect().height();
@@ -74,7 +88,8 @@ auto PdfParser::extract_text(const std::string& filepath, const ParserConfig& co
 
             for (const auto& box : line) {
                 if (!line_text.empty()) line_text += " ";
-                line_text += box.text().to_latin1();
+                auto utf8_bytes = box.text().to_utf8();
+                line_text += std::string(utf8_bytes.begin(), utf8_bytes.end());
 
                 max_font_size = std::max(max_font_size, box.get_font_size());
 

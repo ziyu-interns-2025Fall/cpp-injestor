@@ -23,4 +23,5 @@ class PdfParser {
 public:
     auto extract_text(const std::string& filepath, const ParserConfig& config) -> std::string;
     static auto get_ieee_config() -> ParserConfig;
+    static auto get_generic_config() -> ParserConfig;
 };

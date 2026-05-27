@@ -1,15 +1,16 @@
 # C++ Ingestor Design Specification
 
 ## Overview
-The `cpp-injestor` is a high-performance C++ worker designed to replace the Python-based PDF processing layer in the `pyapi` system. It utilizes the Poppler library for rapid PDF text extraction, replicates the Markdown-based chunking logic, and pushes raw chunks to a Milvus staging collection. Coordination between `pyapi` and the `cpp-injestor` is managed via Redis, ensuring a robust Producer-Consumer architecture.
+The `cpp-ingestor` is a high-performance C++ worker designed to replace the Python-based PDF processing layer in the `pyapi` system. It utilizes the Poppler library for rapid PDF text extraction, replicates the Markdown-based chunking logic, and pushes raw chunks to a Milvus staging collection. Coordination between `pyapi` and the `cpp-ingestor` is managed via Redis, ensuring a robust Producer-Consumer architecture.
 
 ## Architecture & Workflow
 
 ### 1. Job Coordination (Redis)
 - **Role:** Message queue for distributing ingestion tasks.
 - **Producer:** `pyapi` pushes tasks to a Redis List.
-- **Consumer:** `cpp-injestor` uses `BLPOP` to consume tasks efficiently.
+- **Consumer:** `cpp-ingestor` uses `BLPOP` to consume tasks efficiently.
 - **Queue Name:** `ingestion:jobs`
+- **CLI Submit Path:** `ingestor --enqueue <pdf_path> <target_collection> [job_id] [config_type]` pushes a user-submitted PDF job with `RPUSH`, allowing one or more worker processes to drain jobs with `BLPOP`.
 - **Job Payload (JSON):**
   ```json
   {
@@ -39,7 +40,7 @@ The `cpp-injestor` is a high-performance C++ worker designed to replace the Pyth
   - `metadata_json`: VarChar (JSON string containing doc name, headers, char_count)
   - `status`: Int8 (0: Ready, 1: Processing, 2: Completed)
   - `target_collection`: VarChar (Final destination for vectors)
-- **Behavior:** The `cpp-injestor` writes processed chunks directly to this collection.
+- **Behavior:** The `cpp-ingestor` writes processed chunks directly to this collection.
 
 ### 4. Embedding Consumer (`pyapi`)
 - **Role:** Finalizing the RAG pipeline.

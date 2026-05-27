@@ -4,3 +4,5 @@ build/
 .vscode/
 .zed/
 compile_commands.json
+files/
+sample.txt

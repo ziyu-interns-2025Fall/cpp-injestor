@@ -6,6 +6,7 @@
 struct Chunk {
     std::string content;
     std::map<std::string, std::string> metadata;
+    std::vector<float> embedding;
 };
 
 class Chunker {

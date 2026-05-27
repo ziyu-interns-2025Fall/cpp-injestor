@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:alpine
+    ports:
+      - "6380:6379"
+
+  ingestor:
+    build: .
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - MILVUS_HOST=host.docker.internal
+      - MILVUS_PORT=19530
+    depends_on:
+      - redis
+    restart: on-failure
+    volumes:
+      - ./files:/app/files
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

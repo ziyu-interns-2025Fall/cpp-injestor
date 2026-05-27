@@ -10,7 +10,7 @@ MilvusClient::MilvusClient(const std::string& host, int port)
 
 auto MilvusClient::connect() -> bool {
     // REST API is stateless, but we can check if the server is up
-    return true; 
+    return true;
 }
 
 auto WriteCallback(void* contents, size_t size, size_t nmemb, void* userp) -> size_t {
@@ -23,7 +23,7 @@ auto MilvusClient::insert_chunks(const std::string& job_id, const std::string& t
     if (!curl) return false;
 
     std::string url = "http://" + host_ + ":" + std::to_string(port_) + "/v2/vectordb/entities/insert";
-    
+
     json data = json::array();
     for (const auto& chunk : chunks) {
         json entity;
@@ -31,14 +31,22 @@ auto MilvusClient::insert_chunks(const std::string& job_id, const std::string& t
         entity["job_id"] = job_id;
         entity["content"] = chunk.content;
         entity["target_collection"] = target_collection;
-        entity["status"] = 0; // Ready for embedding
-        
+        entity["status"] = 1; // Embedded
+
+        if (chunk.embedding.empty()) {
+            std::cerr << "Warning: chunk embedding is empty, using zeros" << std::endl;
+            std::vector<float> dummy_vector(768, 0.0f);
+            entity["vector"] = dummy_vector;
+        } else {
+            entity["vector"] = chunk.embedding;
+        }
+
         json meta = json::object();
         for (const auto& [key, value] : chunk.metadata) {
             meta[key] = value;
         }
-        entity["metadata_json"] = meta.dump();
-        
+        entity["metadata_json"] = meta.dump(-1, ' ', false, json::error_handler_t::replace);
+
         data.push_back(entity);
     }
 
@@ -46,7 +54,7 @@ auto MilvusClient::insert_chunks(const std::string& job_id, const std::string& t
     payload["collectionName"] = "ingestion_staging";
     payload["data"] = data;
 
-    std::string payload_str = payload.dump();
+    std::string payload_str = payload.dump(-1, ' ', false, json::error_handler_t::replace);
     std::string response_string;
 
     struct curl_slist* headers = nullptr;

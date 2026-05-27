@@ -46,7 +46,8 @@ auto Chunker::split_by_headers(const std::string& markdown) -> std::vector<Chunk
             current_headers[key] = header_text;
 
             // Clear sub-headers
-            for (int i = level + 1; i <= 6; ++i) {
+            constexpr int subheader_max_level = 5;
+            for (int i = level + 1; i <= subheader_max_level; ++i) {
                 current_headers.erase("Header " + std::to_string(i));
             }
 

@@ -4,7 +4,7 @@
 
 **Goal:** Build a high-performance C++ worker that consumes ingestion jobs from Redis, parses PDFs using Poppler, chunks the text according to header configurations, and pushes the raw chunks to a Milvus staging collection.
 
-**Architecture:** A Producer-Consumer model where the `cpp-injestor` is the consumer. It uses `hiredis` for blocking queue reads (`BLPOP`), `poppler-cpp` for text and layout extraction, and the `milvus-sdk-cpp` for database insertions.
+**Architecture:** A Producer-Consumer model where the `cpp-ingestor` is the consumer. It uses `hiredis` for blocking queue reads (`BLPOP`), `poppler-cpp` for text and layout extraction, and the `milvus-sdk-cpp` for database insertions.
 
 **Tech Stack:** C++20, CMake, Poppler, Hiredis, Milvus C++ SDK, nlohmann/json, GoogleTest (GTest).
 
@@ -33,7 +33,7 @@
 - [ ] **Step 1: Write the basic build configuration**
 ```cmake
 cmake_minimum_required(VERSION 3.14)
-project(cpp_injestor CXX)
+project(cpp_ingestor CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -52,12 +52,12 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googletest)
 
-add_executable(injestor src/main.cpp)
-target_include_directories(injestor PRIVATE ${POPPLER_INCLUDE_DIRS})
-target_link_libraries(injestor PRIVATE ${POPPLER_LIBRARIES} hiredis::hiredis nlohmann_json::nlohmann_json)
+add_executable(ingestor src/main.cpp)
+target_include_directories(ingestor PRIVATE ${POPPLER_INCLUDE_DIRS})
+target_link_libraries(ingestor PRIVATE ${POPPLER_LIBRARIES} hiredis::hiredis nlohmann_json::nlohmann_json)
 
-add_executable(injestor_tests tests/main_test.cpp)
-target_link_libraries(injestor_tests gtest_main)
+add_executable(ingestor_tests tests/main_test.cpp)
+target_link_libraries(ingestor_tests gtest_main)
 ```
 
 - [ ] **Step 2: Create a dummy test**
@@ -74,13 +74,13 @@ TEST(DummyTest, EnvironmentIsSetup) {
 #include <iostream>
 
 int main() {
-    std::cout << "cpp-injestor starting..." << std::endl;
+    std::cout << "cpp-ingestor starting..." << std::endl;
     return 0;
 }
 ```
 
 - [ ] **Step 4: Verify build and test pass**
-Run: `mkdir build && cd build && cmake .. && make && ./injestor_tests`
+Run: `mkdir build && cd build && cmake .. && make && ./ingestor_tests`
 Expected: PASS with "1 test from 1 test suite ran"
 
 - [ ] **Step 5: Commit**
@@ -166,7 +166,7 @@ JobPayload RedisConsumer::parse_job(const std::string& json_str) {
 
 - [ ] **Step 4: Update CMakeLists and verify test passes**
 Modify CMakeLists.txt to include the new files in the test executable.
-Run: `cd build && cmake .. && make && ./injestor_tests`
+Run: `cd build && cmake .. && make && ./ingestor_tests`
 Expected: PASS.
 
 - [ ] **Step 5: Commit**
@@ -245,7 +245,7 @@ std::string PdfParser::extract_text(const std::string& filepath) {
 
 - [ ] **Step 3: Update CMakeLists and verify test passes**
 Modify CMakeLists.txt.
-Run: `cd build && cmake .. && make && ./injestor_tests`
+Run: `cd build && cmake .. && make && ./ingestor_tests`
 Expected: PASS.
 
 - [ ] **Step 4: Commit**

@@ -41,7 +41,7 @@ TEST(PdfParserTest, HandlesNonExistentFile) {
 - [x] **Step 2: Update CMakeLists.txt to include the new test**
 
 ```cmake
-add_executable(injestor_tests 
+add_executable(ingestor_tests 
     tests/main_test.cpp 
     tests/RedisConsumer_test.cpp 
     tests/PdfParser_test.cpp 
@@ -51,7 +51,7 @@ add_executable(injestor_tests
 
 - [x] **Step 3: Run test to verify it fails**
 
-Run: `cd build && cmake .. && make && ./injestor_tests`
+Run: `cd build && cmake .. && make && ./ingestor_tests`
 Expected: FAIL (Compilation error: PdfParser.h not found)
 
 - [x] **Step 4: Commit**
@@ -110,9 +110,9 @@ std::string PdfParser::extract_text(const std::string& filepath) {
 - [x] **Step 3: Update CMakeLists.txt to include PdfParser.cpp**
 
 ```cmake
-add_executable(injestor src/main.cpp src/RedisConsumer.cpp src/PdfParser.cpp)
+add_executable(ingestor src/main.cpp src/RedisConsumer.cpp src/PdfParser.cpp)
 # ...
-add_executable(injestor_tests 
+add_executable(ingestor_tests 
     tests/main_test.cpp 
     tests/RedisConsumer_test.cpp 
     tests/PdfParser_test.cpp 
@@ -123,7 +123,7 @@ add_executable(injestor_tests
 
 - [x] **Step 4: Run test to verify it passes**
 
-Run: `cd build && cmake .. && make && ./injestor_tests`
+Run: `cd build && cmake .. && make && ./ingestor_tests`
 Expected: PASS
 
 - [x] **Step 5: Commit**
@@ -139,7 +139,7 @@ git commit -m "feat: implement basic pdf text extraction using poppler"
 
 - [x] **Step 1: Run all tests one last time**
 
-Run: `./build/injestor_tests`
+Run: `./build/ingestor_tests`
 Expected: All tests pass
 
 - [x] **Step 2: Self-review changes**
